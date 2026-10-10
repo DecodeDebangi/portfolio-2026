@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-meta: var(--foreground-meta);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-accent: var(--surface-accent);
+  --color-surface-green: var(--surface-green);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  :root {
+    --background: rgb(234, 230, 221);
+    --foreground: #111111;
+    --foreground-muted: #4A4945; /* Darkened for better readability */
+    --foreground-meta: #6B6964;
+    --accent: #D84025; /* Using a burnt orange/red accent to pop on beige */
+    --surface: #EAE6DF;
+    --surface-secondary: #E3DFD7;
+    --surface-accent: #E3DFD7;
+    --surface-green: #E1E6E0;
+    --border: #D8D5CD;
+    --border-strong: #BCB9B1;
+  }
+
+  [data-theme="dark"], .dark {
+    --background: #141511;
+    --foreground: #F5F5EF;
+    --foreground-muted: #B7B8AE;
+    --foreground-meta: #A4A49A;
+    --accent: #A8C66C;
+    --surface: #1C1D18;
+    --surface-secondary: #23241E;
+    --surface-accent: #1C1D18;
+    --surface-green: #1F221B;
+    --border: #37382F;
+    --border-strong: #45463F;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+}
