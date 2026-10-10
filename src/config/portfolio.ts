@@ -17,7 +17,7 @@ export const portfolioConfig = {
   projects: [
     {
       id: "atlas-knowledge-workspace",
-      category: "01 / RAG & ENTERPRISE AI",
+      category: "RAG & ENTERPRISE AI",
       title: "Atlas — AI Knowledge Workspace",
       shortDescription:
         "Full-stack SaaS workspace where teams upload documents, search internal knowledge, and ask questions with source citations.",
@@ -126,7 +126,7 @@ export const portfolioConfig = {
     },
     {
       id: "findwise-commerce-discovery",
-      category: "02 / AI COMMERCE",
+      category: "AI COMMERCE",
       title: "Findwise — AI Commerce Discovery",
       shortDescription:
         "AI-driven e-commerce discovery platform featuring hybrid search, image embeddings, and real-time recommendations.",
@@ -234,7 +234,7 @@ export const portfolioConfig = {
     },
     {
       id: "relay-incident-response",
-      category: "03 / REAL-TIME SYSTEMS",
+      category: "REAL-TIME SYSTEMS",
       title: "Relay — AI Incident Response Platform",
       shortDescription:
         "Engineering operations dashboard that groups alerts, summarizes logs, and suggests investigation steps via AI agents.",

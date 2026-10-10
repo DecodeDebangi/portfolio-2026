@@ -161,7 +161,7 @@ export function WorkSection() {
               
               <div className="mt-4 md:mt-8">
                 <div className="flex flex-wrap gap-4 md:gap-6 mb-8">
-                  {project.tags.map(tag => (
+                  {project.caseStudy.stack.map(tag => (
                     <span key={tag} className="text-xs font-mono text-foreground-muted tracking-widest uppercase">
                       {tag}
                     </span>
