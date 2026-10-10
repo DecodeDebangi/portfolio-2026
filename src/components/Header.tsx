@@ -59,7 +59,6 @@ export function Header() {
 
         {/* Mobile Navigation Toggle */}
         <div className="flex items-center space-x-2 md:hidden">
-          <ThemeToggle />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 text-foreground-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"

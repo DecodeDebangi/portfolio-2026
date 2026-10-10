@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -15,8 +15,8 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button className="p-2 w-9 h-9 flex items-center justify-center rounded-md border border-transparent" aria-label="Toggle theme placeholder">
-        <div className="w-4 h-4" />
+      <button className={`flex items-center justify-center border border-transparent ${className || 'p-2 w-9 h-9 rounded-md'}`} aria-label="Toggle theme placeholder">
+        <div className="w-5 h-5" />
       </button>
     );
   }
@@ -24,13 +24,13 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="p-2 w-9 h-9 flex items-center justify-center rounded-md transition-colors hover:bg-surface-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className={`flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className || 'p-2 w-9 h-9 rounded-md hover:bg-surface-accent'}`}
       aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >
       {resolvedTheme === "dark" ? (
-        <Sun className="w-4 h-4 text-foreground-muted hover:text-foreground" />
+        <Sun className="w-5 h-5 text-accent" />
       ) : (
-        <Moon className="w-4 h-4 text-foreground-muted hover:text-foreground" />
+        <Moon className="w-5 h-5 text-accent" />
       )}
     </button>
   );
