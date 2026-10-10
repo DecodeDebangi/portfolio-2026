@@ -21,13 +21,13 @@ export function HeroSection() {
   return (
     <section
       id="home"
-      className="relative pt-32 pb-16 md:pt-48 md:pb-32 min-h-[90vh] flex flex-col justify-center overflow-hidden"
+      className="relative pt-24 pb-12 md:pt-48 md:pb-32 min-h-[85vh] flex flex-col justify-center overflow-hidden"
     >
       <div className="relative z-10 px-5 md:px-8 lg:px-16 max-w-[1440px] mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 items-center mt-12 md:mt-0">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-8 items-center mt-4 md:mt-0">
           {/* Text Content */}
-        <div className="flex flex-col space-y-6 md:space-y-10 md:col-span-7 lg:col-span-8">
-          <div className="space-y-6">
+        <div className="flex flex-col space-y-5 md:space-y-10 md:col-span-7 lg:col-span-8">
+          <div className="space-y-4 md:space-y-6">
             <span className="text-xs font-mono text-foreground-meta tracking-widest uppercase">
               {portfolioConfig.title} · AI & FULL-STACK
             </span>
@@ -44,23 +44,23 @@ export function HeroSection() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
             <a
               href="#work"
-              className="inline-flex items-center justify-center px-6 py-3 bg-accent text-white font-medium rounded-md hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="inline-flex items-center justify-center w-[220px] px-6 py-3.5 sm:py-3 bg-accent text-white font-medium rounded-md hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Explore my work
               <ArrowUpRight className="ml-2 w-4 h-4" />
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center justify-center px-6 py-3 bg-surface border border-border text-foreground font-medium rounded-md hover:bg-surface-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="inline-flex items-center justify-center w-[220px] px-6 py-3.5 sm:py-3 bg-surface border border-border text-foreground font-medium rounded-md hover:bg-surface-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Discuss a project
               <ArrowUpRight className="ml-2 w-4 h-4" />
             </a>
             
-            <div className="flex items-center space-x-5 sm:ml-4 pt-2 sm:pt-0 px-2">
+            <div className="flex items-center justify-start space-x-6 sm:ml-4 pt-4 sm:pt-0 px-1">
               <a
                 href={portfolioConfig.socials.github}
                 target="_blank"
@@ -82,7 +82,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="pt-4 flex items-center space-x-2 text-xs font-mono text-foreground-meta tracking-wide">
+          <div className="pt-2 flex items-center justify-start space-x-2 text-xs font-mono text-foreground-meta tracking-wide">
             <span className="flex items-center">
               <span className="w-2 h-2 rounded-full bg-accent mr-2"></span>
               {portfolioConfig.location}

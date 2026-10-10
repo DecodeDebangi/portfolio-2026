@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { portfolioConfig } from "@/config/portfolio";
 import { ArrowUpRight, X, Layout, Search, Layers } from "lucide-react";
+import { Mermaid } from "./Mermaid";
 
 type Project = typeof portfolioConfig.projects[0];
 
@@ -22,12 +23,12 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
         aria-hidden="true"
       />
       <div 
-        className="relative w-full max-w-3xl max-h-full bg-surface border border-border shadow-2xl overflow-y-auto flex flex-col"
+        className="relative w-full max-w-3xl max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-6rem)] bg-surface border border-border shadow-2xl flex flex-col overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <div className="sticky top-0 bg-surface/90 backdrop-blur-md border-b border-border p-4 flex items-center justify-between z-10">
+        <div className="shrink-0 bg-surface border-b border-border p-4 flex items-center justify-between z-10">
           <span className="text-xs font-mono text-foreground-meta tracking-wide">
             CASE STUDY
           </span>
@@ -40,7 +41,7 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
           </button>
         </div>
         
-        <div className="p-6 md:p-10 space-y-12">
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-12">
           <header className="space-y-4">
             <h2 id="modal-title" className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
               {project.caseStudy.title}
@@ -50,41 +51,28 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
             </p>
           </header>
 
-          <section className="space-y-8">
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground">Summary</h3>
-              <p className="text-foreground-muted leading-relaxed">{project.caseStudy.summary}</p>
-            </div>
-            
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground">Context and problem</h3>
-              <p className="text-foreground-muted leading-relaxed">{project.caseStudy.contextAndProblem}</p>
-            </div>
-            
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground">My role</h3>
-              <p className="text-foreground-muted leading-relaxed">{project.caseStudy.myRole}</p>
-            </div>
-            
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground">Architecture</h3>
-              <p className="text-foreground-muted leading-relaxed">{project.caseStudy.architecture}</p>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground">Key decisions</h3>
-              <p className="text-foreground-muted leading-relaxed">{project.caseStudy.keyDecisions}</p>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground">Challenges</h3>
-              <p className="text-foreground-muted leading-relaxed">{project.caseStudy.challenges}</p>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground">Outcome</h3>
-              <p className="text-foreground-muted leading-relaxed">{project.caseStudy.outcome}</p>
-            </div>
+          <section className="space-y-10">
+            {project.caseStudy.sections.map((section, idx) => (
+              <div key={idx} className="space-y-4">
+                <h3 className="text-xl font-medium text-foreground">{section.title}</h3>
+                <div className="space-y-3">
+                  {section.content.map((paragraph, pIdx) => (
+                    <div key={pIdx} className="text-foreground-muted leading-relaxed">
+                      {paragraph.startsWith('```mermaid') ? (
+                        <Mermaid chart={paragraph.replace(/```mermaid\n|\n```/g, '')} />
+                      ) : paragraph.startsWith('•') ? (
+                        <div className="flex">
+                          <span className="mr-3 shrink-0">•</span>
+                          <span>{paragraph.replace(/^•\s*/, '')}</span>
+                        </div>
+                      ) : (
+                        <p>{paragraph}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </section>
 
           <section className="pt-8 border-t border-border">

@@ -25,23 +25,103 @@ export const portfolioConfig = {
       image: "/images/projects/client-project.jpg",
       visualType: "client-work" as const,
       caseStudy: {
-        title: "Building a reliable, multi-tenant AI workspace.",
-        category: "Full-stack SaaS · RAG · Enterprise AI",
-        summary:
-          "Demonstrates a complete AI product, from document ingestion and backend architecture to permissions, retrieval quality, and a polished UI.",
-        contextAndProblem:
-          "AI applications require systematic evaluations, robust permissions, and reliable background processing rather than just relying on successful API demos.",
-        myRole:
-          "Engineered the asynchronous ingestion pipeline (upload → extract → chunk → embed → index) and the evaluation suite for retrieval accuracy, groundedness, latency, and cost.",
-        architecture:
-          "Multi-tenant workspaces with RBAC. Hybrid retrieval combining keyword and semantic search, with citations. Streaming answers and conversation history.",
-        keyDecisions:
-          "Implemented retryable background jobs, idempotency, rate limits, and caching to ensure production-grade reliability.",
-        challenges:
-          "Managing document-level permissions and ensuring grounded, accurate responses via systematic evaluations.",
-        outcome:
-          "A robust, scalable AI workspace that prioritizes measurable quality, security, and enterprise-grade reliability.",
-        stack: ["Next.js", "TypeScript", "NestJS", "PostgreSQL", "pgvector", "Redis", "OpenAI API"],
+        title: "Atlas — AI Knowledge Workspace",
+        category: "Full-Stack Engineering · Retrieval-Augmented Generation · Enterprise AI",
+        stack: ["Next.js", "TypeScript", "NestJS", "PostgreSQL", "pgvector", "Redis", "background workers", "LLM APIs", "Docker"],
+        sections: [
+          {
+            title: "Overview",
+            content: [
+              "Making organizational knowledge searchable, useful, and trustworthy.",
+              "Organizations accumulate valuable information across technical documentation, internal guides, product specifications, policies, and reports. However, finding the right information across a growing collection of documents can be time-consuming.",
+              "Traditional keyword search can struggle when users don't know the exact terms used in a document. Meanwhile, a generic AI chatbot may generate plausible answers without providing sufficient evidence or respecting the permissions attached to the underlying information.",
+              "Atlas is an AI-powered knowledge workspace designed to address these problems. It allows teams to upload documents, search their content using natural language, and ask questions that are answered using relevant source material.",
+              "The objective is to combine the usability of conversational AI with the reliability of a well-engineered information retrieval system."
+            ]
+          },
+          {
+            title: "The problem",
+            content: [
+              "A useful enterprise knowledge assistant needs to solve more than question answering.",
+              "• Fragmented knowledge: Relevant information is distributed across multiple documents and formats.",
+              "• Poor discoverability: Users may not know the keywords needed to find a specific answer.",
+              "• Untrustworthy answers: AI-generated responses can contain unsupported statements.",
+              "• Access-control risks: A user must never retrieve information they aren't authorized to access.",
+              "• Slow document processing: Large documents can make synchronous upload-and-index workflows unreliable.",
+              "• Limited observability: Without retrieval and quality metrics, it's difficult to understand why an answer was poor.",
+              "Atlas is designed around these challenges rather than treating the LLM as the entire product."
+            ]
+          },
+          {
+            title: "Product experience",
+            content: [
+              "The application provides a workspace where users can:",
+              "• Create an organization and invite team members.",
+              "• Upload documents and monitor their processing status.",
+              "• Search documents using keywords or natural-language queries.",
+              "• Ask questions and receive answers with citations linking to relevant source passages.",
+              "• Open cited documents and inspect the evidence behind an answer.",
+              "• Review previous conversations and provide feedback on answer quality.",
+              "The interface is designed to make the system's reasoning traceable through retrieved evidence, rather than presenting an answer as an unquestionable black box."
+            ]
+          },
+          {
+            title: "Architecture and system design",
+            content: [
+              "The proposed architecture separates the user-facing application, business logic, document processing, retrieval, and answer generation.",
+              "```mermaid\nflowchart TD\n    A[User / UI] --> B[Next.js App]\n    B --> C[NestJS API]\n    subgraph Ingestion\n    D[Object Storage] --> E[Job Queue]\n    E --> F[Text Extraction]\n    F --> G[Chunking & Embeddings]\n    G --> H[(pgvector)]\n    end\n    subgraph Retrieval\n    I[Semantic Search] --> H\n    I --> J[Relevance Filter]\n    J --> K[LLM Provider]\n    K --> L[Cited Response]\n    end\n    C -- \"Upload\" --> D\n    C -- \"Query\" --> I\n```",
+              "High-level flow: User → Next.js application → NestJS API → Retrieval and orchestration → LLM provider → Cited response.",
+              "Document ingestion runs asynchronously: Document upload → Object storage → Job queue → Text extraction → Chunking → Embedding generation → PostgreSQL/pgvector indexing.",
+              "1. Frontend and API layer: The Next.js application handles the workspace experience, document management, search interface, conversation history, and streaming responses. NestJS provides a structured backend for authentication, authorization, document metadata, workspace management, search orchestration, and AI workflows.",
+              "2. Asynchronous document ingestion: Document ingestion is handled by background workers instead of a long-running synchronous request. When a user uploads a document, the API stores its metadata and schedules a processing job. Workers extract text, split it into manageable chunks, generate embeddings, and write the indexed records to the database.",
+              "3. Retrieval-augmented generation: When a user asks a question, the retrieval pipeline identifies relevant document passages and provides them as context to the language model. The pipeline includes query validation, semantic retrieval using vector similarity, relevance filtering, and answer generation constrained by the retrieved evidence.",
+              "4. Data model and tenancy: Every document and chunk is associated with its organization and relevant access-control metadata. Authorization is enforced server-side during retrieval, not merely through frontend visibility.",
+              "5. Streaming and caching: Streaming responses improve the perceived responsiveness of the application. Redis can be used for short-lived caching, rate limiting, and coordination where appropriate."
+            ]
+          },
+          {
+            title: "Key engineering decisions",
+            content: [
+              "• Why asynchronous ingestion? Document extraction and embedding generation may be slow or fail independently of the upload request. A queue decouples upload responsiveness from processing time and makes retries and monitoring easier.",
+              "• Why combine semantic and keyword retrieval? Semantic retrieval can identify conceptually related passages, while keyword search can be valuable for exact names, identifiers, and technical terms.",
+              "• Why store citations explicitly? Citations make answers verifiable. Maintaining chunk and document references throughout the pipeline allows the UI to link generated claims to source material.",
+              "• Why isolate the LLM provider? A provider abstraction makes it easier to compare models, change providers, handle provider-specific failures, and track costs without rewriting the application's core business logic."
+            ]
+          },
+          {
+            title: "Security and reliability",
+            content: [
+              "Security is a core system requirement, not a later enhancement.",
+              "• Workspace isolation and server-side role-based access control.",
+              "• File-type validation, size limits, and secure document storage.",
+              "• Protection against prompt injection in uploaded documents and retrieved content.",
+              "• Secrets management and restricted permissions for external services.",
+              "• Rate limits, request quotas, timeouts, retries, and graceful handling of provider outages.",
+              "Retrieved documents must be treated as untrusted input. Instructions found inside a document must not be allowed to override system policies or grant the model unauthorized tool access."
+            ]
+          },
+          {
+            title: "How success will be measured",
+            content: [
+              "The project will use a repeatable evaluation dataset containing representative questions and expected supporting passages.",
+              "Metrics to collect include:",
+              "• Retrieval precision and recall at selected ranking cutoffs.",
+              "• Citation correctness and answer groundedness.",
+              "• Answer quality on questions with insufficient evidence.",
+              "• p50 and p95 latency for retrieval and complete responses.",
+              "• Document ingestion success rate and processing duration.",
+              "• Token usage and cost per answered question.",
+              "• Authorization test coverage and cross-tenant isolation failures."
+            ]
+          },
+          {
+            title: "What this project demonstrates",
+            content: [
+              "Atlas demonstrates my approach to building AI applications as complete software systems. The challenge is not simply generating text; it is coordinating data ingestion, retrieval, authorization, background processing, user experience, and evaluation in a way that makes the product dependable.",
+              "The project also explores how established backend engineering principles—clear service boundaries, idempotency, observability, and explicit failure handling—apply to AI-enabled products."
+            ]
+          }
+        ]
       },
     },
     {
@@ -54,23 +134,102 @@ export const portfolioConfig = {
       image: "/images/projects/ai-search.jpg",
       visualType: "ai-search" as const,
       caseStudy: {
-        title: "Intelligent product discovery and personalization.",
-        category: "AI search · Recommendations · Distributed systems",
-        summary:
-          "An e-commerce discovery platform where users can search by text or upload a product image, receiving highly relevant products and recommendations.",
-        contextAndProblem:
-          "Modern commerce requires advanced discovery. This project unifies vector search, traditional Solr, and personalization into a self-owned scalable product.",
-        myRole:
-          "Architected the event-driven indexing pipeline, hybrid search capabilities, and the recommendation service based on user browsing events.",
-        architecture:
-          "Event-driven architecture using Kafka for search analytics and user interactions. Product catalog ingestion with background indexing.",
-        keyDecisions:
-          "Combined image embeddings and text embeddings with hybrid search and filters. Utilized Redis caching with graceful degradation and search fallbacks.",
-        challenges:
-          "Balancing relevance and performance, managing asynchronous re-indexing, and building an admin dashboard to track p95 latency.",
-        outcome:
-          "A comprehensive discovery engine proving senior capability in search relevance, distributed event processing, and measurable data quality.",
-        stack: ["Next.js", "NestJS", "Python", "Solr", "PostgreSQL", "pgvector", "Redis", "Kafka", "Docker"],
+        title: "Findwise — AI-Powered Commerce Discovery",
+        category: "AI Search · Personalization · E-Commerce · Event-Driven Architecture",
+        stack: ["Next.js", "TypeScript", "NestJS", "Python", "Apache Solr", "PostgreSQL/pgvector", "Redis", "Kafka", "Docker"],
+        sections: [
+          {
+            title: "Overview",
+            content: [
+              "Helping customers discover products by intent, not just keywords.",
+              "Product discovery becomes increasingly difficult as a commerce catalog grows. Customers may know what a product looks like without knowing its name, or they may describe what they need using language that doesn't match the catalog's product titles.",
+              "Traditional search often depends heavily on exact terms, while recommendation systems can struggle to respond quickly to changing user interests.",
+              "Findwise is an AI-powered product discovery platform designed to make commerce search more intuitive. It combines text search, image-based search, product filtering, and behavioral personalization in one application.",
+              "The goal is to help customers find relevant products through multiple discovery paths while giving operators visibility into search quality and system performance."
+            ]
+          },
+          {
+            title: "The problem",
+            content: [
+              "The application explores four related challenges.",
+              "• Keyword mismatch: Customers search using natural descriptions that differ from catalog terminology.",
+              "• Visual discovery: Customers want products resembling a reference image but may not know the correct product category or name.",
+              "• Generic recommendations: Recommendations can be less useful when they ignore current session intent and product context.",
+              "• Operational complexity: Search indexes, behavioral events, product data, and cached results must remain consistent as the catalog changes.",
+              "Findwise treats search relevance, data freshness, and system reliability as interconnected engineering concerns."
+            ]
+          },
+          {
+            title: "Product experience",
+            content: [
+              "The platform supports several discovery workflows:",
+              "• Customers search by product name, category, or natural-language description.",
+              "• Customers upload a reference image and retrieve visually similar products.",
+              "• Customers refine results using price, category, availability, and other catalog filters.",
+              "• The application provides related products or personalized recommendations.",
+              "• Operators inspect catalog indexing status and search performance.",
+              "• Search analytics help identify unsuccessful queries and opportunities to improve relevance.",
+              "The initial implementation focuses on a well-defined sample catalog rather than attempting to reproduce an entire commercial marketplace."
+            ]
+          },
+          {
+            title: "Architecture and system design",
+            content: [
+              "Findwise separates catalog ingestion, search, personalization, and the customer-facing experience.",
+              "```mermaid\nflowchart TD\n    subgraph Ingestion\n    A[Product Catalog] --> B[Validation & Normalization]\n    B --> C[Kafka Topic]\n    C --> D[Indexing Workers]\n    D --> E[(Solr Search Index)]\n    end\n    subgraph Retrieval\n    F[User Query / Image] --> G[Hybrid Search API]\n    G --> H[Semantic / Image Embedding]\n    H --> E\n    G --> I[Keyword Retrieval]\n    I --> E\n    end\n    subgraph Personalization\n    J[User Interactions] --> K[Kafka Event Bus]\n    K --> L[Affinity Scoring]\n    L --> M[(Redis Cache)]\n    M -. \"Ranks Results\" .-> G\n    end\n```",
+              "Catalog ingestion: Product source → Validation and normalization → Event publication → Indexing workers → Search index.",
+              "Text and image search: Search request → Query processing → Keyword and semantic retrieval → Filtering and ranking → Product results.",
+              "Personalization: Customer interactions → Event pipeline → Behavioral aggregates and affinity scores → Recommendation service → Cached recommendations.",
+              "1. Catalog ingestion and indexing: The ingestion service validates product records and normalizes attributes. Product changes are published as events. Indexing workers consume those events and update the search index asynchronously. This avoids coupling catalog writes directly to the time required to refresh every search representation.",
+              "2. Text and semantic search: Text search handles product names, exact phrases, attributes, and filters. Semantic search represents product descriptions and queries as embeddings so that conceptually related items can be discovered even when they don't share identical wording. A hybrid retrieval pipeline combines the strengths of both approaches.",
+              "3. Visual product search: For image search, the application accepts a user-provided reference image and passes it through a dedicated image-embedding pipeline. The search service retrieves candidate products with compatible image embeddings, applies catalog filters, and returns ranked results.",
+              "4. Behavioral personalization: The system records relevant interactions (views, searches, clicks, saved items). An event-processing component aggregates these interactions into behavioral signals. A recommendation service uses those signals alongside product metadata to generate relevant suggestions.",
+              "5. Caching and event-driven consistency: Redis caches popular search results and recommendations. Catalog changes must invalidate or refresh affected cached data. Kafka distributes product and behavioral events to downstream consumers, while idempotent processing prevents duplicate events from inflating behavioral counts."
+            ]
+          },
+          {
+            title: "Key engineering decisions",
+            content: [
+              "• Why support both keyword and semantic search? Keyword search is effective for exact attributes and identifiers. Semantic search helps with intent and meaning. Combining them allows the system to support a wider range of queries.",
+              "• Why process catalog updates asynchronously? Separating source writes from indexing reduces coupling and allows indexing to scale independently.",
+              "• Why use event-driven personalization? Events allow behavioral processing to evolve independently of the main customer request.",
+              "• Why start with a simple ranking baseline? A measurable baseline makes improvements attributable. It is more useful to demonstrate that a new ranking strategy improves relevance on a defined evaluation set than to introduce a complex model without evidence."
+            ]
+          },
+          {
+            title: "Security and reliability",
+            content: [
+              "• Validate uploaded images and impose size and processing limits.",
+              "• Enforce authorization on protected catalog and administrative APIs.",
+              "• Apply rate limits to expensive search and embedding operations.",
+              "• Handle failed events with bounded retries and dead-letter processing.",
+              "• Monitor indexing lag and reconcile index contents with the source catalog.",
+              "• Define retention and deletion policies for user interaction data.",
+              "• Use safe fallbacks if personalization or the embedding service becomes unavailable.",
+              "The core text-search experience should remain usable when an optional AI or recommendation component is temporarily unavailable."
+            ]
+          },
+          {
+            title: "How success will be measured",
+            content: [
+              "The evaluation plan compares baseline keyword search against semantic and hybrid retrieval.",
+              "Metrics to collect include:",
+              "• Precision@K, Recall@K, and ranking quality such as NDCG@K.",
+              "• Image retrieval quality using a manually reviewed query-image dataset.",
+              "• Search p50 and p95 latency under a documented load.",
+              "• Catalog indexing lag and recovery time after failed jobs.",
+              "• Cache hit rate and database/query load.",
+              "• Event processing throughput, duplicate handling, and error rate."
+            ]
+          },
+          {
+            title: "What this project demonstrates",
+            content: [
+              "Findwise brings together AI retrieval, traditional search infrastructure, real-time behavioral signals, and backend reliability in a single product.",
+              "It demonstrates how I approach AI integrations as components of a larger system: the model is only one part of the solution. Catalog quality, ranking, event processing, caching, data consistency, and observability all affect the end-user experience."
+            ]
+          }
+        ]
       },
     },
     {
@@ -83,23 +242,106 @@ export const portfolioConfig = {
       image: "/images/projects/commerce-scale.jpg",
       visualType: "commerce-scale" as const,
       caseStudy: {
-        title: "Agentic workflows for engineering operations.",
-        category: "Real-time systems · AI agents · Reliability",
-        summary:
-          "An operations platform that receives application alerts, deduplicates incidents, summarizes logs, and orchestrates AI-assisted investigations.",
-        contextAndProblem:
-          "Incident response involves sifting through logs and alerts. This system demonstrates understanding of real-time events, observability, and controlled AI actions beyond a simple request-response API.",
-        myRole:
-          "Built the real-time event pipeline for alerts and state transitions. Integrated an AI assistant that links suggestions to evidence with explicit tool access and human approval.",
-        architecture:
-          "Real-time updates via WebSockets/SSE. Event pipeline with retry handling, dead-letter queues, idempotent consumers, and replay capabilities.",
-        keyDecisions:
-          "Enforced operational safeguards including tool access with explicit permissions, audit trails, and dashboards for error and queue lag monitoring.",
-        challenges:
-          "Ensuring reliability and state consistency during high-volume alert floods, and keeping the AI agent safely constrained.",
-        outcome:
-          "A highly reliable incident response tool showcasing production safeguards, event-driven orchestration, and meaningful, controlled AI integration.",
-        stack: ["Next.js", "NestJS", "PostgreSQL", "Redis", "Kafka", "LLM API", "Docker"],
+        title: "Relay — AI-Assisted Incident Response",
+        category: "Backend Engineering · Distributed Systems · AI-Assisted Operations",
+        stack: ["Next.js", "TypeScript", "NestJS", "PostgreSQL", "Redis", "Kafka", "LLM APIs", "Docker", "OpenTelemetry"],
+        sections: [
+          {
+            title: "Overview",
+            content: [
+              "Turning noisy application alerts into actionable investigations.",
+              "Modern applications produce a constant stream of logs, alerts, exceptions, and operational events. During an incident, engineers must identify related failures, understand the likely scope, find useful evidence, and coordinate a response.",
+              "An AI assistant can summarize large volumes of operational information, but allowing an AI model to execute arbitrary production actions introduces significant risk.",
+              "Relay is an incident-response workspace designed to help engineers understand and investigate incidents faster. It ingests application alerts, groups related events, maintains a shared incident timeline, and uses AI to summarize evidence and suggest investigation steps.",
+              "The system is designed around a clear boundary: AI helps engineers reason about an incident, while consequential actions remain subject to explicit authorization and human approval."
+            ]
+          },
+          {
+            title: "The problem",
+            content: [
+              "Relay focuses on several operational challenges.",
+              "• Alert fatigue: Repeated or related events can obscure the underlying incident.",
+              "• Fragmented context: Engineers often need to correlate events across services and time windows.",
+              "• Slow investigation: Understanding a failure may require manually reviewing logs and prior incident notes.",
+              "• Unreliable AI suggestions: A summary or suggested fix can be misleading if it lacks evidence.",
+              "• Dangerous automation: An AI system should not receive unrestricted access to production infrastructure.",
+              "The product aims to improve the investigation workflow without replacing engineering judgment."
+            ]
+          },
+          {
+            title: "Product experience",
+            content: [
+              "The application provides a central incident workspace where engineers can:",
+              "• Receive alerts through an authenticated webhook or event stream.",
+              "• View incident severity, affected services, status, and event timeline.",
+              "• Group duplicate or related alerts into a single incident.",
+              "• Inspect relevant logs and supporting evidence.",
+              "• Generate an AI-assisted incident summary and a list of possible investigation steps.",
+              "• Assign ownership, add notes, and update incident status.",
+              "• Record approved actions and preserve an audit trail.",
+              "The AI assistant is designed to distinguish observed evidence from hypotheses. It cites the relevant logs used to support a conclusion and clearly communicates uncertainty."
+            ]
+          },
+          {
+            title: "Architecture and system design",
+            content: [
+              "Relay separates event ingestion, incident management, real-time delivery, AI analysis, and action execution.",
+              "```mermaid\nflowchart TD\n    subgraph Event Processing\n    A[Monitoring Alerts] --> B[Authenticated Webhook]\n    B --> C[Kafka Queue]\n    C --> D[Deduplication & Correlation]\n    D --> E[(Incident DB)]\n    end\n    subgraph Real-time UI\n    E -- \"State Changes\" --> F[WebSocket Service]\n    F --> G[Live Incident Dashboard]\n    end\n    subgraph AI Investigation\n    H[User Requests Summary] --> I[Redaction & Policy Check]\n    I --> J[Log Retrieval]\n    J --> K[LLM Provider]\n    K --> L[Structured AI Summary]\n    L --> G\n    end\n```",
+              "Event processing: Monitoring source → Authenticated API → Validation → Queue → Deduplication → Incident state.",
+              "AI investigation: Incident context → Evidence selection → Redaction/Policy checks → LLM analysis → Structured summary → Human review.",
+              "Real-time UI: Incident state changes → Event publication → WebSocket/SSE delivery → Live incident dashboard.",
+              "1. Event ingestion and processing: The ingestion API accepts structured alerts, assigns a stable identifier, and publishes them to a queue. Consumers normalize attributes, detect duplicates, and correlate related events based on rules like service, fingerprint, and time window.",
+              "2. Incident lifecycle and data model: Incident status transitions are validated by the backend. A relational database stores incident records, relationships, state transitions, and audit history. Event payloads retain references to log evidence without bloating the primary database.",
+              "3. Real-time incident dashboard: The frontend receives updates via WebSockets or Server-Sent Events. The backend remains the source of truth, allowing clients to reload state after disconnecting. The system handles duplicate notifications and out-of-order events gracefully.",
+              "4. AI-assisted investigation: When an engineer requests an AI summary, the system gathers relevant incident data (alerts, logs, service metadata). Sensitive values are redacted. The LLM generates a structured response (summary, symptoms, hypotheses, steps, cited evidence).",
+              "5. Controlled tools and human approval: Read-only tools allow the AI to retrieve related logs or deployment records. Any action that changes a production system requires explicit human approval, authorization checks, and an auditable record of execution."
+            ]
+          },
+          {
+            title: "Key engineering decisions",
+            content: [
+              "• Why use an event-driven pipeline? Alert ingestion should not wait for every downstream operation to finish. Queue-based processing absorbs bursts and allows independent scaling.",
+              "• Why separate AI analysis from incident state? Generated summaries can be revised or corrected. Keeping them separate preserves the integrity of the incident timeline and makes AI output easier to audit.",
+              "• Why require approval for consequential actions? Incident response involves sensitive systems. Human approval, least-privilege tools, and server-side authorization reduce the risk of an incorrect AI suggestion causing further damage.",
+              "• Why keep the first version read-only? Read-only investigation is easier to validate and safer to demonstrate."
+            ]
+          },
+          {
+            title: "Security and reliability",
+            content: [
+              "• Authenticate ingestion sources and validate payloads.",
+              "• Apply role-based permissions to incidents and operational tools.",
+              "• Redact secrets and sensitive log fields before model processing.",
+              "• Treat log contents as untrusted data that may contain prompt injection.",
+              "• Require human approval for consequential actions with immutable audit records.",
+              "• Use idempotent consumers, bounded retries, and dead-letter queues.",
+              "• Apply timeouts, quotas, and graceful fallbacks for AI-provider failures.",
+              "If the AI provider is unavailable, engineers should still be able to view alerts, inspect evidence, assign incidents, and manage their lifecycle."
+            ]
+          },
+          {
+            title: "How success will be measured",
+            content: [
+              "The evaluation uses a repeatable collection of simulated incidents with known symptoms and expected outcomes.",
+              "Metrics to collect include:",
+              "• Event ingestion success rate and processing latency.",
+              "• Duplicate-alert grouping accuracy.",
+              "• Queue lag and recovery after worker failure.",
+              "• AI summary factuality against the provided incident evidence.",
+              "• Accuracy of evidence references and unsupported-claim rate.",
+              "• Real-time update latency and reconnect recovery.",
+              "• Authorization failures, audit completeness, and successful policy-enforcement tests."
+            ]
+          },
+          {
+            title: "What this project demonstrates",
+            content: [
+              "Relay demonstrates how backend architecture, event-driven processing, real-time interfaces, observability, and AI orchestration can work together in an operationally sensitive product.",
+              "Its central engineering challenge is balancing the usefulness of AI-generated insights with the reliability, traceability, and access controls expected of an incident-response system.",
+              "The project reflects my approach to integrating AI responsibly: use it where it improves the workflow, preserve evidence and human judgment, and design the surrounding system to remain useful when the model fails."
+            ]
+          }
+        ]
       },
     }
   ],
