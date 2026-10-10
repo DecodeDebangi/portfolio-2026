@@ -130,7 +130,7 @@ export function WorkSection() {
         {portfolioConfig.projects.map((project, index) => (
           <div 
             key={project.id}
-            className="group grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16 items-start mb-24 last:mb-0"
+            className="group grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-start pb-24 md:pb-32 mb-24 md:mb-32 border-b border-border last:border-0 last:pb-0 last:mb-0"
           >
             {/* Visual */}
             <div className={`md:col-span-6 lg:col-span-7 relative aspect-[4/3] md:aspect-video w-full border border-border overflow-hidden order-1 ${index % 2 === 1 ? 'md:order-2' : 'md:order-1'}`}>
