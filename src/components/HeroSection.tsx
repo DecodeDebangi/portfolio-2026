@@ -12,7 +12,7 @@ export function HeroSection() {
       <div className="relative z-10 px-5 md:px-8 lg:px-16 max-w-[1440px] mx-auto w-full">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 items-center mt-12 md:mt-0">
           {/* Text Content */}
-        <div className="flex flex-col space-y-6 md:space-y-10 order-2 md:order-1 md:col-span-7 lg:col-span-8">
+        <div className="flex flex-col space-y-6 md:space-y-10 md:col-span-7 lg:col-span-8">
           <div className="space-y-6">
             <span className="text-xs font-mono text-foreground-meta tracking-widest uppercase">
               {portfolioConfig.title} · AI & FULL-STACK
@@ -58,8 +58,8 @@ export function HeroSection() {
         </div>
 
         {/* Portrait */}
-        <div className="order-1 md:order-2 md:col-span-5 lg:col-span-4 flex justify-center md:justify-end w-full">
-          <div className="relative w-full max-w-[400px] lg:max-w-none aspect-[4/5] md:aspect-[3/4] rounded-sm overflow-hidden bg-surface-secondary border border-border transition-all duration-700">
+        <div className="md:col-span-5 lg:col-span-4 flex justify-center md:justify-end w-full mt-8 md:mt-0">
+          <div className="relative w-full max-w-[280px] md:max-w-[400px] lg:max-w-none aspect-square md:aspect-[3/4] rounded-full md:rounded-sm overflow-hidden bg-surface-secondary border border-border transition-all duration-700">
             {/* The image should be placed at public/images/debangi-portrait.jpg */}
             {/* If missing, this container acts as a graceful placeholder */}
             <div className="absolute inset-0 flex items-center justify-center text-foreground-muted text-sm px-6 text-center">
