@@ -7,10 +7,11 @@ export function HeroSection() {
   return (
     <section
       id="home"
-      className="relative pt-32 pb-16 md:pt-48 md:pb-32 px-5 md:px-8 lg:px-16 max-w-[1440px] mx-auto min-h-[90vh] flex flex-col justify-center"
+      className="relative pt-32 pb-16 md:pt-48 md:pb-32 min-h-[90vh] flex flex-col justify-center overflow-hidden"
     >
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 items-center mt-12 md:mt-0">
-        {/* Text Content */}
+      <div className="relative z-10 px-5 md:px-8 lg:px-16 max-w-[1440px] mx-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 items-center mt-12 md:mt-0">
+          {/* Text Content */}
         <div className="flex flex-col space-y-6 md:space-y-10 order-2 md:order-1 md:col-span-7 lg:col-span-8">
           <div className="space-y-6">
             <span className="text-xs font-mono text-foreground-meta tracking-widest uppercase">
@@ -77,6 +78,7 @@ export function HeroSection() {
               }}
             />
           </div>
+        </div>
         </div>
       </div>
 

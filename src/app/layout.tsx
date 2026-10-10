@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { CustomCursor } from "@/components/CustomCursor";
+import { GlobalGrid } from "@/components/GlobalGrid";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -32,6 +33,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans tracking-tight">
         <ThemeProvider attribute="data-theme" defaultTheme="light">
+          <GlobalGrid />
           <CustomCursor />
           {children}
         </ThemeProvider>
