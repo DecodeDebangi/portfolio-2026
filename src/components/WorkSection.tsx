@@ -169,7 +169,7 @@ export function WorkSection() {
                 </div>
                 <button 
                   onClick={() => setActiveProject(project)}
-                  className="inline-flex items-center text-sm font-mono tracking-widest uppercase text-foreground hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="group inline-flex items-center px-6 py-3 border border-foreground/20 rounded-full text-xs font-mono tracking-widest uppercase text-foreground hover:bg-foreground hover:text-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
                 >
                   Explore case study
                   <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />

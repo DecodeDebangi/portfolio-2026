@@ -47,17 +47,17 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
             <a
               href="#work"
-              className="inline-flex items-center justify-center w-[220px] px-6 py-3.5 sm:py-3 bg-accent text-white font-medium rounded-md hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="inline-flex items-center justify-center w-[220px] px-6 py-3.5 sm:py-3 bg-accent text-white font-medium rounded-full hover:bg-accent/90 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Explore my work
               <ArrowUpRight className="ml-2 w-4 h-4" />
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center justify-center w-[220px] px-6 py-3.5 sm:py-3 bg-surface border border-border text-foreground font-medium rounded-md hover:bg-surface-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="group inline-flex items-center justify-center w-[220px] px-6 py-3.5 sm:py-3 bg-surface border border-foreground/20 text-foreground font-medium rounded-full hover:bg-foreground hover:text-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Discuss a project
-              <ArrowUpRight className="ml-2 w-4 h-4" />
+              <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
             </a>
             
             <div className="flex items-center justify-start space-x-6 sm:ml-4 pt-4 sm:pt-0 px-1">
