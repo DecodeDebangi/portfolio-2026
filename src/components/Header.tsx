@@ -73,8 +73,8 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-background border-b border-border">
-          <nav className="flex flex-col px-5 py-4 space-y-4">
+        <div className="md:hidden absolute top-20 left-4 right-4 bg-surface border border-border shadow-[0_30px_60px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.6)] rounded-xl overflow-hidden z-50">
+          <nav className="flex flex-col p-6 space-y-6">
             {navLinks.map((link) => (
               <a
                 key={link.name}
