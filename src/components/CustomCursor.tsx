@@ -16,15 +16,13 @@ export function CustomCursor() {
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
       if (!isVisible) setIsVisible(true);
-    };
 
-    const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Check if hovering over a clickable element
       if (
         target.closest("a") || 
         target.closest("button") || 
-        target.closest("[role='button']")
+        target.closest("[role='button']") ||
+        target.closest("img")
       ) {
         setIsHovering(true);
       } else {
@@ -35,12 +33,10 @@ export function CustomCursor() {
     const handleMouseLeave = () => setIsVisible(false);
 
     window.addEventListener("mousemove", updateMousePosition);
-    window.addEventListener("mouseover", handleMouseOver);
     document.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
       window.removeEventListener("mousemove", updateMousePosition);
-      window.removeEventListener("mouseover", handleMouseOver);
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.documentElement.classList.remove("md:cursor-none");
     };
