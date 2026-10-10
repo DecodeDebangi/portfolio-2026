@@ -59,7 +59,7 @@ export function AboutSection() {
           </div>
           
           {/* Image 3 (Bottom Center) */}
-          <div className="absolute top-[60%] left-[2%] w-[50%] aspect-[3/4] border-[6px] border-background bg-surface-secondary z-30 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
+          <div className="absolute top-[50%] left-[2%] w-[50%] aspect-[3/4] border-[6px] border-background bg-surface-secondary z-30 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
             <img 
               src={portfolioConfig.about.images[2]} 
               alt="Lifestyle" 
