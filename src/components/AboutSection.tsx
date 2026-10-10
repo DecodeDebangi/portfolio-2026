@@ -39,31 +39,31 @@ export function AboutSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-start border-t border-border-strong pt-16">
         {/* Photo Collage */}
-        <div className="md:col-span-5 lg:col-span-4 relative aspect-[4/5] w-full">
-          {/* Image 1 (Top Left - Working) */}
-          <div className="absolute top-0 left-0 w-[65%] aspect-square border-[6px] border-background bg-surface-secondary z-10 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
+        <div className="md:col-span-5 lg:col-span-4 relative aspect-[3/4] w-full">
+          {/* Image 1 (Top Left) */}
+          <div className="absolute top-0 left-0 w-[50%] aspect-[4/5] border-[6px] border-background bg-surface-secondary z-10 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
             <img 
               src={portfolioConfig.about.images[0]} 
-              alt="Working" 
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
+              alt="Adventure" 
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
             />
           </div>
           
-          {/* Image 2 (Middle Right - Gym) */}
-          <div className="absolute top-[20%] right-0 w-[60%] aspect-[4/5] border-[6px] border-background bg-surface-secondary z-20 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
+          {/* Image 2 (Middle Right) */}
+          <div className="absolute top-[32%] right-[1%] w-[65%] aspect-[4/5] border-[6px] border-background bg-surface-secondary z-20 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
             <img 
               src={portfolioConfig.about.images[1]} 
-              alt="Gymming" 
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
+              alt="Hiking" 
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
             />
           </div>
           
-          {/* Image 3 (Bottom Center - Travel) */}
-          <div className="absolute bottom-0 left-[10%] w-[75%] aspect-[3/2] border-[6px] border-background bg-surface-secondary z-30 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
+          {/* Image 3 (Bottom Center) */}
+          <div className="absolute top-[60%] left-[2%] w-[50%] aspect-[3/4] border-[6px] border-background bg-surface-secondary z-30 overflow-hidden shadow-sm hover:z-40 transition-all duration-300">
             <img 
               src={portfolioConfig.about.images[2]} 
-              alt="Travelling" 
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
+              alt="Lifestyle" 
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
             />
           </div>
         </div>

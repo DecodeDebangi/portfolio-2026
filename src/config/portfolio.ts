@@ -409,9 +409,9 @@ export const portfolioConfig = {
     headline: "Engineer by profession. Curious by nature.",
     copy: "I enjoy turning complex ideas into software people can actually use. My work spans full-stack development, backend architecture, and AI integrations.\n\nOutside of work, I'm usually lifting, travelling somewhere new, or learning something completely unrelated to my job.",
     images: [
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80"
+      "/images/projects/IMG_6284.jpg",
+      "/images/projects/IMG_0932.JPG",
+      "/images/projects/IMG_8732.jpg"
     ],
     interests: [
       { 
