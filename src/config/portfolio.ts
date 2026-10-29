@@ -125,110 +125,103 @@ export const portfolioConfig = {
       },
     },
     {
-      id: "findwise-commerce-discovery",
-      category: "AI COMMERCE",
-      title: "Findwise — AI Commerce Discovery",
+      id: "hybrid-product-search",
+      category: "AI SEARCH",
+      title: "Hybrid Product Search",
       shortDescription:
-        "AI-driven e-commerce discovery platform featuring hybrid search, image embeddings, and real-time recommendations.",
-      tags: ["Next.js", "NestJS", "Python", "Solr", "Kafka"],
-      image: "/images/projects/ai-search.jpg",
+        "Search over 44k fashion products that understands intent: BM25 keyword search and CLIP image embeddings in Solr, fused with Reciprocal Rank Fusion. 52% better ranking than keyword-only search on a labelled test set.",
+      tags: ["Next.js", "NestJS", "Python", "CLIP", "Solr"],
+      image: "/images/projects/hybrid-search-demo.jpg",
+      video: {
+        webm: "/images/projects/hybrid-search-demo.webm",
+        mp4: "/images/projects/hybrid-search-demo.mp4",
+      },
+      repoUrl: "https://github.com/DecodeDebangi/hybrid-product-search",
       visualType: "ai-search" as const,
       caseStudy: {
-        title: "Findwise — AI-Powered Commerce Discovery",
-        category: "AI Search · Personalization · E-Commerce · Event-Driven Architecture",
-        stack: ["Next.js", "TypeScript", "NestJS", "Python", "Apache Solr", "PostgreSQL/pgvector", "Redis", "Kafka", "Docker"],
+        title: "Hybrid Product Search",
+        category: "Information Retrieval · Multimodal AI · Search Evaluation",
+        stack: ["Next.js", "TypeScript", "NestJS", "Python", "FastAPI", "CLIP", "Apache Solr", "Redis", "Docker"],
         sections: [
           {
             title: "Overview",
             content: [
-              "Helping customers discover products by intent, not just keywords.",
-              "Product discovery becomes increasingly difficult as a commerce catalog grows. Customers may know what a product looks like without knowing its name, or they may describe what they need using language that doesn't match the catalog's product titles.",
-              "Traditional search often depends heavily on exact terms, while recommendation systems can struggle to respond quickly to changing user interests.",
-              "Findwise is an AI-powered product discovery platform designed to make commerce search more intuitive. It combines text search, image-based search, product filtering, and behavioral personalization in one application.",
-              "The goal is to help customers find relevant products through multiple discovery paths while giving operators visibility into search quality and system performance."
+              "Search that understands what shoppers mean, not just the words they type.",
+              "Keyword search is precise but literal. Search a fashion catalog for “something warm for winter” and it returns nothing, because no product title contains those words, even though the catalog is full of beanies, scarves and stoles.",
+              "Hybrid Product Search combines classic keyword ranking with AI image understanding over a real catalog of 44,072 fashion products. Shoppers can search by text, upload a photo, or browse visually similar items, and a compare mode shows keyword and hybrid results side by side.",
+              "Every relevance claim is backed by an offline evaluation: labelled query sets, a standard ranking metric, blind human grading, and a held-out set committed before any experiment ran.",
             ]
           },
           {
             title: "The problem",
             content: [
-              "The application explores four related challenges.",
-              "• Keyword mismatch: Customers search using natural descriptions that differ from catalog terminology.",
-              "• Visual discovery: Customers want products resembling a reference image but may not know the correct product category or name.",
-              "• Generic recommendations: Recommendations can be less useful when they ignore current session intent and product context.",
-              "• Operational complexity: Search indexes, behavioral events, product data, and cached results must remain consistent as the catalog changes.",
-              "Findwise treats search relevance, data freshness, and system reliability as interconnected engineering concerns."
+              "Shoppers describe intent; catalogs store attributes. “Proline Men Black Patterned Beanie” is a perfect answer to “something warm for winter”, but shares no words with it.",
+              "• Vocabulary gap: for descriptive queries such as “something to carry my laptop in”, keyword search returned no results at all for 13 of 17 queries.",
+              "• Synonyms and wrong senses: “trainers” and “billfold” rarely appear in titles, and “denims” matches a Denim-brand deodorant.",
+              "• Precision still matters: for exact queries like “navy blue shirt”, keyword search is hard to beat, so replacing it with vector search alone makes those queries worse.",
             ]
           },
           {
             title: "Product experience",
             content: [
-              "The platform supports several discovery workflows:",
-              "• Customers search by product name, category, or natural-language description.",
-              "• Customers upload a reference image and retrieve visually similar products.",
-              "• Customers refine results using price, category, availability, and other catalog filters.",
-              "• The application provides related products or personalized recommendations.",
-              "• Operators inspect catalog indexing status and search performance.",
-              "• Search analytics help identify unsuccessful queries and opportunities to improve relevance.",
-              "The initial implementation focuses on a well-defined sample catalog rather than attempting to reproduce an entire commercial marketplace."
+              "• Four ranking modes: Lexical (BM25), Semantic (CLIP), Hybrid, and Compare, which shows keyword and hybrid results side by side.",
+              "• Search by photo: upload or drag in an image to find visually similar products.",
+              "• “More like this” on any result, using that product's image embedding.",
+              "• Gender, type, colour and usage filters, applied to both retrievers before ranking.",
+              "• Explainable results: each card shows its rank in each retriever, and the detected product type is shown for the query.",
+              "• A live latency panel with p50 and p95 per search mode.",
             ]
           },
           {
             title: "Architecture and system design",
             content: [
-              "Findwise separates catalog ingestion, search, personalization, and the customer-facing experience.",
-              "```mermaid\nflowchart TD\n    subgraph Ingestion\n    A[Product Catalog] --> B[Validation & Normalization]\n    B --> C[Kafka Topic]\n    C --> D[Indexing Workers]\n    D --> E[(Solr Search Index)]\n    end\n    subgraph Retrieval\n    F[User Query / Image] --> G[Hybrid Search API]\n    G --> H[Semantic / Image Embedding]\n    H --> E\n    G --> I[Keyword Retrieval]\n    I --> E\n    end\n    subgraph Personalization\n    J[User Interactions] --> K[Kafka Event Bus]\n    K --> L[Affinity Scoring]\n    L --> M[(Redis Cache)]\n    M -. \"Ranks Results\" .-> G\n    end\n```",
-              "Catalog ingestion: Product source → Validation and normalization → Event publication → Indexing workers → Search index.",
-              "Text and image search: Search request → Query processing → Keyword and semantic retrieval → Filtering and ranking → Product results.",
-              "Personalization: Customer interactions → Event pipeline → Behavioral aggregates and affinity scores → Recommendation service → Cached recommendations.",
-              "1. Catalog ingestion and indexing: The ingestion service validates product records and normalizes attributes. Product changes are published as events. Indexing workers consume those events and update the search index asynchronously. This avoids coupling catalog writes directly to the time required to refresh every search representation.",
-              "2. Text and semantic search: Text search handles product names, exact phrases, attributes, and filters. Semantic search represents product descriptions and queries as embeddings so that conceptually related items can be discovered even when they don't share identical wording. A hybrid retrieval pipeline combines the strengths of both approaches.",
-              "3. Visual product search: For image search, the application accepts a user-provided reference image and passes it through a dedicated image-embedding pipeline. The search service retrieves candidate products with compatible image embeddings, applies catalog filters, and returns ranked results.",
-              "4. Behavioral personalization: The system records relevant interactions (views, searches, clicks, saved items). An event-processing component aggregates these interactions into behavioral signals. A recommendation service uses those signals alongside product metadata to generate relevant suggestions.",
-              "5. Caching and event-driven consistency: Redis caches popular search results and recommendations. Catalog changes must invalidate or refresh affected cached data. Kafka distributes product and behavioral events to downstream consumers, while idempotent processing prevents duplicate events from inflating behavioral counts."
+              "Five services, run together with Docker Compose.",
+              "```mermaid\nflowchart TD\n    subgraph Indexing\n    A[\"Fashion catalog: 44,072 products\"] --> B[\"CLIP image encoder\"]\n    B --> S[(\"Apache Solr: BM25 text index + HNSW vector index\")]\n    end\n    subgraph Search\n    Q[\"Text query or photo\"] --> U[\"Query understanding\"]\n    U --> L[\"BM25 keyword retrieval, top 100\"]\n    Q --> E[\"CLIP query encoder\"]\n    E -.-> R[(\"Redis embedding cache\")]\n    E --> V[\"kNN vector retrieval, top 100\"]\n    L --> F[\"Reciprocal Rank Fusion\"]\n    V --> F\n    F --> O[\"Ranked results\"]\n    end\n    S -.-> L\n    S -.-> V\n```",
+              "• Web UI (Next.js, React): search, filters, compare view and image upload.",
+              "• Search API (NestJS, TypeScript): query understanding, parallel keyword and vector retrieval, fusion, and latency metrics.",
+              "• Embedding service (Python, FastAPI, open_clip): CLIP ViT-B/32 turns query text and photos into 512-dimensional vectors in the same space as the product images.",
+              "• Apache Solr: one engine holds both the BM25 text index and an HNSW vector index, with the same filters applied to both.",
+              "• Redis: caches query embeddings for 24 hours. Search keeps working if it is unavailable.",
+              "How a hybrid query works: 1. The API detects any product type the query names. 2. BM25 and CLIP kNN retrieval each return 100 candidates, in parallel. 3. The two lists are merged with Reciprocal Rank Fusion. 4. The top results are returned with each retriever's rank attached.",
             ]
           },
           {
             title: "Key engineering decisions",
             content: [
-              "• Why support both keyword and semantic search? Keyword search is effective for exact attributes and identifiers. Semantic search helps with intent and meaning. Combining them allows the system to support a wider range of queries.",
-              "• Why process catalog updates asynchronously? Separating source writes from indexing reduces coupling and allows indexing to scale independently.",
-              "• Why use event-driven personalization? Events allow behavioral processing to evolve independently of the main customer request.",
-              "• Why start with a simple ranking baseline? A measurable baseline makes improvements attributable. It is more useful to demonstrate that a new ranking strategy improves relevance on a defined evaluation set than to introduce a complex model without evidence."
+              "• Why Reciprocal Rank Fusion? BM25 scores and cosine similarities sit on different scales. RRF combines ranks only (score = Σ 1 / (60 + rank)), so nothing needs normalising and no weights need tuning.",
+              "• Why one engine for text and vectors? Solr runs BM25 and HNSW kNN together: one index, one set of filters, and no consistency problem between two stores.",
+              "• Why embed images rather than titles? Titles in this catalog are short and formulaic and already covered by BM25; the images carry the style and occasion signal.",
+              "• Why fetch 100 vector candidates? HNSW is approximate. Fetching 100 and trimming gave noticeably better recall than asking for only the results shown.",
+              "• Query understanding: “black formal watch” returned five shoes, because “black formal” alone matched 1,885 products. The API now detects the product type a query names, using a vocabulary built from the catalog, and limits keyword matches to it. Vector search is left alone, so a wrong detection can't remove the right products.",
             ]
           },
           {
-            title: "Security and reliability",
+            title: "Results",
             content: [
-              "• Validate uploaded images and impose size and processing limits.",
-              "• Enforce authorization on protected catalog and administrative APIs.",
-              "• Apply rate limits to expensive search and embedding operations.",
-              "• Handle failed events with bounded retries and dead-letter processing.",
-              "• Monitor indexing lag and reconcile index contents with the source catalog.",
-              "• Define retention and deletion policies for user interaction data.",
-              "• Use safe fallbacks if personalization or the embedding service becomes unavailable.",
-              "The core text-search experience should remain usable when an optional AI or recommendation component is temporarily unavailable."
+              "Measured with nDCG@10 on 50 labelled queries. Relevance comes from catalog attributes, so the ideal ranking is counted exactly rather than estimated.",
+              "• Hybrid search scores 0.828 against 0.543 for keyword-only search, a 52% improvement, and beats or ties it on 46 of 50 queries.",
+              "• Descriptive queries improve from 0.158 to 0.704, while exact keyword queries keep their precision (0.943 vs 0.930).",
+              "• Query understanding adds 10% nDCG@10 on 40 generated colour + usage + product-type queries, with no regressions on the other query sets.",
+              "• Human validation: I graded 50 results blind, without seeing the search mode or the automatic grade. Agreement with the automatic labels was 82% on the first pass and 86% (Cohen's κ 0.46) after re-checking four likely mis-clicks. In most remaining disagreements, the automatic grader was the stricter one.",
+              "• Latency: 13 ms median and 24 ms p95 for hybrid search on a laptop, with keyword and vector retrieval running in parallel.",
+              "• A negative result, reported: a “semantic verification” fusion strategy scored best on the development set but tied on a 30-query held-out set written before the experiment. Plain RRF stayed the default.",
             ]
           },
           {
-            title: "How success will be measured",
+            title: "Limits and next steps",
             content: [
-              "The evaluation plan compares baseline keyword search against semantic and hybrid retrieval.",
-              "Metrics to collect include:",
-              "• Precision@K, Recall@K, and ranking quality such as NDCG@K.",
-              "• Image retrieval quality using a manually reviewed query-image dataset.",
-              "• Search p50 and p95 latency under a documented load.",
-              "• Catalog indexing lag and recovery time after failed jobs.",
-              "• Cache hit rate and database/query load.",
-              "• Event processing throughput, duplicate handling, and error rate."
+              "• Occasion queries such as “outfit for a beach wedding” still return some nightdresses. The catalog images are 60×80 pixels, too small for CLIP to see fine detail.",
+              "• On synonym queries, hybrid (0.837) trails vector-only search (0.897), because keyword search adds wrong-sense matches.",
+              "• Next: a re-ranking stage on the fused top 50, and title embeddings as a third signal, each judged on a fresh query set.",
             ]
           },
           {
             title: "What this project demonstrates",
             content: [
-              "Findwise brings together AI retrieval, traditional search infrastructure, real-time behavioral signals, and backend reliability in a single product.",
-              "It demonstrates how I approach AI integrations as components of a larger system: the model is only one part of the solution. Catalog quality, ranking, event processing, caching, data consistency, and observability all affect the end-user experience."
+              "Hybrid Product Search shows how I build AI features as measurable systems: a classic search engine and a multimodal model working together, with each design decision checked against data rather than intuition.",
+              "It also shows the discipline production search needs: held-out evaluation, validating an automatic metric against human judgement, and reporting what didn't work.",
             ]
-          }
+          },
         ]
       },
     },

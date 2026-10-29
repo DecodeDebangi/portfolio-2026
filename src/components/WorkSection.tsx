@@ -1,11 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { portfolioConfig } from "@/config/portfolio";
 import { ArrowUpRight, X, Layout, Search, Layers } from "lucide-react";
 import { Mermaid } from "./Mermaid";
 
 type Project = typeof portfolioConfig.projects[0];
+
+function DemoVideo({ project, className }: { project: Project; className: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Respect reduced-motion settings: show the poster frame instead of looping the demo.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) ref.current?.pause();
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      className={className}
+      poster={project.image}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-label={`${project.title} demo`}
+    >
+      <source src={project.video?.webm} type="video/webm" />
+      <source src={project.video?.mp4} type="video/mp4" />
+    </video>
+  );
+}
 
 function CaseStudyModal({ project, onClose }: { project: Project; onClose: () => void }) {
   useEffect(() => {
@@ -134,8 +160,13 @@ export function WorkSection() {
           >
             {/* Visual */}
             <div className={`md:col-span-6 lg:col-span-7 relative aspect-[4/3] md:aspect-video w-full border border-foreground/10 shadow-md rounded-xl overflow-hidden order-1 ${index % 2 === 1 ? 'md:order-2' : 'md:order-1'}`}>
-              {project.image ? (
-                <img 
+              {project.video ? (
+                <DemoVideo
+                  project={project}
+                  className="w-full h-full object-cover object-left"
+                />
+              ) : project.image ? (
+                <img
                   src={project.image} 
                   alt={project.title} 
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
@@ -167,13 +198,26 @@ export function WorkSection() {
                     </span>
                   ))}
                 </div>
-                <button 
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+                <button
                   onClick={() => setActiveProject(project)}
                   className="group inline-flex items-center px-6 py-3 border border-foreground/20 rounded-full text-xs font-mono tracking-widest uppercase text-foreground hover:bg-foreground hover:text-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
                 >
                   Explore case study
                   <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </button>
+                {project.repoUrl && (
+                  <a
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center py-3 text-xs font-mono tracking-widest uppercase text-foreground-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
+                  >
+                    View code
+                    <ArrowUpRight className="ml-2 w-4 h-4" />
+                  </a>
+                )}
+                </div>
               </div>
             </div>
           </div>
