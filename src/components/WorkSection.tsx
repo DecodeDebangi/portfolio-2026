@@ -11,8 +11,18 @@ function DemoVideo({ project, className }: { project: Project; className: string
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
     // Respect reduced-motion settings: show the poster frame instead of looping the demo.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) ref.current?.pause();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.pause();
+      return;
+    }
+    // Mobile browsers only autoplay videos that are muted as a property, not just an attribute,
+    // and some ignore the autoplay attribute after hydration, so start playback explicitly.
+    // If the browser still refuses (e.g. iOS Low Power Mode), the poster frame stays visible.
+    video.muted = true;
+    video.play().catch(() => {});
   }, []);
 
   return (
@@ -27,8 +37,9 @@ function DemoVideo({ project, className }: { project: Project; className: string
       preload="metadata"
       aria-label={`${project.title} demo`}
     >
-      <source src={project.video?.webm} type="video/webm" />
+      {/* MP4 first: every phone can decode H.264, while some iOS versions pick WebM and fail. */}
       <source src={project.video?.mp4} type="video/mp4" />
+      <source src={project.video?.webm} type="video/webm" />
     </video>
   );
 }
