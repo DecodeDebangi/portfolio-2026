@@ -16,111 +16,108 @@ export const portfolioConfig = {
   },
   projects: [
     {
-      id: "atlas-knowledge-workspace",
-      category: "RAG & ENTERPRISE AI",
-      title: "Atlas — AI Knowledge Workspace",
+      id: "askdocs",
+      category: "RAG & AI SUPPORT",
+      title: "AskDocs: AI Support Assistant",
       shortDescription:
-        "Full-stack SaaS workspace where teams upload documents, search internal knowledge, and ask questions with source citations.",
-      tags: ["Next.js", "NestJS", "PostgreSQL", "pgvector", "Redis"],
-      image: "/images/projects/client-project.jpg",
-      visualType: "client-work" as const,
+        "Support chatbot that answers from a help center, links to the exact section it used, and hands off to a person instead of guessing. 96% answer accuracy on a hand-written test set, with all 10 questions it shouldn't answer handed off.",
+      tags: ["Python", "FastAPI", "PostgreSQL", "pgvector", "RAG"],
+      image: "/images/projects/askdocs-demo.jpg",
+      video: {
+        webm: "/images/projects/askdocs-demo.webm",
+        mp4: "/images/projects/askdocs-demo.mp4",
+      },
+      liveUrl: "https://askdocs-e8kq.onrender.com",
+      liveNote: "Free hosting: the demo can take about a minute to wake up.",
+      repoUrl: "https://github.com/DecodeDebangi/askdocs",
+      visualType: "ai-search" as const,
       caseStudy: {
-        title: "Atlas — AI Knowledge Workspace",
-        category: "Full-Stack Engineering · Retrieval-Augmented Generation · Enterprise AI",
-        stack: ["Next.js", "TypeScript", "NestJS", "PostgreSQL", "pgvector", "Redis", "background workers", "LLM APIs", "Docker"],
+        title: "AskDocs: AI Support Assistant",
+        category: "Retrieval-Augmented Generation · AI Support · LLM Evaluation",
+        stack: ["Python", "FastAPI", "PostgreSQL", "pgvector", "bge-small embeddings", "Gemini", "JavaScript widget", "Docker", "Render", "Neon"],
         sections: [
           {
             title: "Overview",
             content: [
-              "Making organizational knowledge searchable, useful, and trustworthy.",
-              "Organizations accumulate valuable information across technical documentation, internal guides, product specifications, policies, and reports. However, finding the right information across a growing collection of documents can be time-consuming.",
-              "Traditional keyword search can struggle when users don't know the exact terms used in a document. Meanwhile, a generic AI chatbot may generate plausible answers without providing sufficient evidence or respecting the permissions attached to the underlying information.",
-              "Atlas is an AI-powered knowledge workspace designed to address these problems. It allows teams to upload documents, search their content using natural language, and ask questions that are answered using relevant source material.",
-              "The objective is to combine the usability of conversational AI with the reliability of a well-engineered information retrieval system."
+              "A support chatbot that would rather hand off than make something up.",
+              "The risk with a support chatbot is a confident wrong answer about a refund or a policy. AskDocs answers only from a company's own help center, links each answer to the section it came from, and passes the question to a person when the sources don't cover it.",
+              "The live demo is the support assistant for Fernhollow Outdoor Co., a fictional outdoor-gear store with a 37-page help center. A side panel shows which sections were found, which were cited, and why the bot answered or handed off.",
+              "The same engine was first built and evaluated on 629 pages of real technical documentation, the Supabase guides.",
             ]
           },
           {
             title: "The problem",
             content: [
-              "A useful enterprise knowledge assistant needs to solve more than question answering.",
-              "• Fragmented knowledge: Relevant information is distributed across multiple documents and formats.",
-              "• Poor discoverability: Users may not know the keywords needed to find a specific answer.",
-              "• Untrustworthy answers: AI-generated responses can contain unsupported statements.",
-              "• Access-control risks: A user must never retrieve information they aren't authorized to access.",
-              "• Slow document processing: Large documents can make synchronous upload-and-index workflows unreliable.",
-              "• Limited observability: Without retrieval and quality metrics, it's difficult to understand why an answer was poor.",
-              "Atlas is designed around these challenges rather than treating the LLM as the entire product."
+              "Generating an answer is the easy part. Knowing when not to answer is harder.",
+              "• Exact names and loose wording: keyword search finds names like supabase.auth.signUp, while vector search finds questions phrased differently from the docs. A support bot needs both.",
+              "• Unverifiable answers: without a link to the exact section, a customer can't check what the bot said.",
+              "• Questions a bot shouldn't handle: chargebacks, double charges and legal threats need a person, even when a related page exists.",
+              "• Over-generalizing: asked about refunds, an early version said “we do not provide refunds” when the source only said unused credits aren't refunded.",
             ]
           },
           {
             title: "Product experience",
             content: [
-              "The application provides a workspace where users can:",
-              "• Create an organization and invite team members.",
-              "• Upload documents and monitor their processing status.",
-              "• Search documents using keywords or natural-language queries.",
-              "• Ask questions and receive answers with citations linking to relevant source passages.",
-              "• Open cited documents and inspect the evidence behind an answer.",
-              "• Review previous conversations and provide feedback on answer quality.",
-              "The interface is designed to make the system's reasoning traceable through retrieved evidence, rather than presenting an answer as an unquestionable black box."
+              "• Answers stream in with numbered citations that link to the exact help-center section.",
+              "• Test questions in the demo cover exact facts, policy edge cases, applying a rule to a specific case, and questions the bot should refuse.",
+              "• A “How it answered” panel shows the sections found, the ones cited, and the reason for answering or handing off.",
+              "• Disputes and legal matters go straight to a person without an LLM call.",
+              "• One script tag adds the chat to any website. The widget is a single dependency-free file in a Shadow DOM, so the host page's CSS can't affect it.",
             ]
           },
           {
             title: "Architecture and system design",
             content: [
-              "The proposed architecture separates the user-facing application, business logic, document processing, retrieval, and answer generation.",
-              "```mermaid\nflowchart TD\n    A[User / UI] --> B[Next.js App]\n    B --> C[NestJS API]\n    subgraph Ingestion\n    D[Object Storage] --> E[Job Queue]\n    E --> F[Text Extraction]\n    F --> G[Chunking & Embeddings]\n    G --> H[(pgvector)]\n    end\n    subgraph Retrieval\n    I[Semantic Search] --> H\n    I --> J[Relevance Filter]\n    J --> K[LLM Provider]\n    K --> L[Cited Response]\n    end\n    C -- \"Upload\" --> D\n    C -- \"Query\" --> I\n```",
-              "High-level flow: User → Next.js application → NestJS API → Retrieval and orchestration → LLM provider → Cited response.",
-              "Document ingestion runs asynchronously: Document upload → Object storage → Job queue → Text extraction → Chunking → Embedding generation → PostgreSQL/pgvector indexing.",
-              "1. Frontend and API layer: The Next.js application handles the workspace experience, document management, search interface, conversation history, and streaming responses. NestJS provides a structured backend for authentication, authorization, document metadata, workspace management, search orchestration, and AI workflows.",
-              "2. Asynchronous document ingestion: Document ingestion is handled by background workers instead of a long-running synchronous request. When a user uploads a document, the API stores its metadata and schedules a processing job. Workers extract text, split it into manageable chunks, generate embeddings, and write the indexed records to the database.",
-              "3. Retrieval-augmented generation: When a user asks a question, the retrieval pipeline identifies relevant document passages and provides them as context to the language model. The pipeline includes query validation, semantic retrieval using vector similarity, relevance filtering, and answer generation constrained by the retrieved evidence.",
-              "4. Data model and tenancy: Every document and chunk is associated with its organization and relevant access-control metadata. Authorization is enforced server-side during retrieval, not merely through frontend visibility.",
-              "5. Streaming and caching: Streaming responses improve the perceived responsiveness of the application. Redis can be used for short-lived caching, rate limiting, and coordination where appropriate."
+              "One FastAPI service, with Postgres holding both the vector and the full-text index.",
+              "```mermaid\nflowchart TD\n    subgraph Indexing\n    A[\"Help center: sitemap crawl or Markdown import\"] --> B[\"Chunk by heading\"]\n    B --> C[\"Embed locally: bge-small\"]\n    C --> D[(\"Postgres: pgvector + full-text\")]\n    end\n    subgraph Answering\n    Q[\"Customer question\"] --> G{\"Dispute or legal matter?\"}\n    G -- Yes --> X[\"Hand off to a person\"]\n    G -- No --> H[\"Hybrid search: vector + keyword, fused with RRF\"]\n    H --> L[\"LLM answers from numbered sources\"]\n    L -- \"NO_ANSWER\" --> X\n    L --> O[\"Streamed answer with citations\"]\n    end\n    D -.-> H\n```",
+              "• Ingestion: reads a sitemap or a folder of Markdown files and splits each page along its headings, so every chunk belongs to one section and citations can link straight to it. Re-ingesting only re-embeds pages whose content changed.",
+              "• Search: vector and keyword search run together in Postgres and are merged with Reciprocal Rank Fusion. An optional cross-encoder re-scores the top 20 when the host has the CPU for it.",
+              "• Answering: the LLM answers from numbered sources, or replies NO_ANSWER, which is never shown to the customer and triggers a handoff.",
+              "• Logging: every answer is stored with its reason (answered, escalated, no sources, no answer or error), so unanswered questions can be reviewed.",
+              "• LLM: any OpenAI-compatible API, chosen with three environment variables. The demo uses gemini-3.5-flash-lite.",
             ]
           },
           {
             title: "Key engineering decisions",
             content: [
-              "• Why asynchronous ingestion? Document extraction and embedding generation may be slow or fail independently of the upload request. A queue decouples upload responsiveness from processing time and makes retries and monitoring easier.",
-              "• Why combine semantic and keyword retrieval? Semantic retrieval can identify conceptually related passages, while keyword search can be valuable for exact names, identifiers, and technical terms.",
-              "• Why store citations explicitly? Citations make answers verifiable. Maintaining chunk and document references throughout the pipeline allows the UI to link generated claims to source material.",
-              "• Why isolate the LLM provider? A provider abstraction makes it easier to compare models, change providers, handle provider-specific failures, and track costs without rewriting the application's core business logic."
+              "• Why check for disputes before searching? A related page shouldn't tempt the bot into answering a chargeback. Matching these first means they always reach a person, and general policy questions such as how refunds work are still answered.",
+              "• Why chunk by heading? It keeps each chunk to one section, so a citation can open the exact part of the page. Code blocks are never cut in half.",
+              "• Why Postgres for everything? pgvector and full-text search in one database means one store to run and no syncing between systems.",
+              "• Why drop the reranker in production? The free host has a tenth of a CPU. Without the reranker the right page is ranked first less often (52% vs 71% on the docs set), but the LLM reads 8 sources and accuracy falls by only one question.",
+              "• Fitting the free plan: at 0.1 CPU, startup took 3 minutes and one search took over 4. Skipping the reranker and running the embedding model on one thread brought search to about 1 second and peak memory to about 250 MB.",
             ]
           },
           {
-            title: "Security and reliability",
+            title: "Results",
             content: [
-              "Security is a core system requirement, not a later enhancement.",
-              "• Workspace isolation and server-side role-based access control.",
-              "• File-type validation, size limits, and secure document storage.",
-              "• Protection against prompt injection in uploaded documents and retrieved content.",
-              "• Secrets management and restricted permissions for external services.",
-              "• Rate limits, request quotas, timeouts, retries, and graceful handling of provider outages.",
-              "Retrieved documents must be treated as untrusted input. Instructions found inside a document must not be allowed to override system policies or grant the model unauthorized tool access."
+              "Measured on hand-written question sets, with each answerable question labelled with the pages that answer it and the facts a correct answer must contain. All figures use the hosted demo's setup, without the reranker.",
+              "Store help center, 64 questions:",
+              "• 96% answer accuracy (52 of 54), and a correct page cited for 98% (53 of 54).",
+              "• All 10 questions it should not answer were handed off, including a prompt injection, a chargeback and a legal threat.",
+              "• 1 of 54 answerable questions was wrongly handed off.",
+              "• Response time: 1.9 s median and 4.3 s p95.",
+              "Supabase documentation, 53 questions:",
+              "• 93% answer accuracy (39 of 42), with all 11 questions it should refuse handed off.",
+              "• Response time: 2.0 s median and 4.8 s p95.",
+              "Testing also changed the product. The store set started at 91%, and most misses were answers where the source said no (“fuel can't ship to Alaska”) and the model treated that as no answer. Two labels were also corrected because they rejected correct answers. On the docs set, the evaluation found a bug that hand-testing hadn't: context assembly stopped at the first short chunk and dropped every source after it.",
             ]
           },
           {
-            title: "How success will be measured",
+            title: "Limits and next steps",
             content: [
-              "The project will use a repeatable evaluation dataset containing representative questions and expected supporting passages.",
-              "Metrics to collect include:",
-              "• Retrieval precision and recall at selected ranking cutoffs.",
-              "• Citation correctness and answer groundedness.",
-              "• Answer quality on questions with insufficient evidence.",
-              "• p50 and p95 latency for retrieval and complete responses.",
-              "• Document ingestion success rate and processing duration.",
-              "• Token usage and cost per answered question.",
-              "• Authorization test coverage and cross-tenant isolation failures."
+              "• These question sets also guided the prompt changes, so the scores aren't from a held-out set.",
+              "• “Do you price match REI?” is still handed off, even though the help center says it doesn't price-match other retailers.",
+              "• Handoffs are logged, but nothing notifies a support team yet.",
+              "• Next: handoff notifications by Slack or email, and an admin page for reviewing logged answers.",
             ]
           },
           {
             title: "What this project demonstrates",
             content: [
-              "Atlas demonstrates my approach to building AI applications as complete software systems. The challenge is not simply generating text; it is coordinating data ingestion, retrieval, authorization, background processing, user experience, and evaluation in a way that makes the product dependable.",
-              "The project also explores how established backend engineering principles—clear service boundaries, idempotency, observability, and explicit failure handling—apply to AI-enabled products."
+              "AskDocs shows how I approach an LLM product: decide what it must never do, measure that alongside accuracy, and let the failures decide what to fix next.",
+              "It also shows a full delivery: ingestion, search, an embeddable widget, an evaluation suite and a working public deployment within tight hosting limits.",
             ]
-          }
+          },
         ]
       },
     },

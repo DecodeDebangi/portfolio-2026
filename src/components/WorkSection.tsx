@@ -217,6 +217,17 @@ export function WorkSection() {
                   Explore case study
                   <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </button>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center py-3 text-xs font-mono tracking-widest uppercase text-foreground-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
+                  >
+                    Live demo
+                    <ArrowUpRight className="ml-2 w-4 h-4" />
+                  </a>
+                )}
                 {project.repoUrl && (
                   <a
                     href={project.repoUrl}
@@ -229,6 +240,9 @@ export function WorkSection() {
                   </a>
                 )}
                 </div>
+                {project.liveNote && (
+                  <p className="mt-4 text-xs text-foreground-meta">{project.liveNote}</p>
+                )}
               </div>
             </div>
           </div>
