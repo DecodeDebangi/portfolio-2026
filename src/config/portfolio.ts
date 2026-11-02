@@ -223,117 +223,101 @@ export const portfolioConfig = {
       },
     },
     {
-      id: "relay-incident-response",
-      category: "REAL-TIME SYSTEMS",
-      title: "Relay — AI Incident Response Platform",
+      id: "ragspec",
+      category: "AI EVALUATION",
+      title: "RagSpec: RAG Evaluator",
       shortDescription:
-        "Engineering operations dashboard that groups alerts, summarizes logs, and suggests investigation steps via AI agents.",
-      tags: ["Next.js", "NestJS", "PostgreSQL", "Kafka", "WebSockets"],
-      image: "/images/projects/commerce-scale.jpg",
-      visualType: "commerce-scale" as const,
+        "Automated tests for RAG chatbots: scores retrieval, has an LLM judge check every claim against the sources, and uses a paired bootstrap to tell real regressions from noise. Benchmarked 5 retrievers across 3 public datasets.",
+      tags: ["Python", "LLM Evaluation", "Gemini", "pgvector", "BM25"],
+      image: "/images/projects/ragspec-demo.jpg",
+      video: {
+        webm: "/images/projects/ragspec-demo.webm",
+        mp4: "/images/projects/ragspec-demo.mp4",
+      },
+      repoUrl: "https://github.com/DecodeDebangi/ragspec",
+      visualType: "ai-search" as const,
       caseStudy: {
-        title: "Relay — AI-Assisted Incident Response",
-        category: "Backend Engineering · Distributed Systems · AI-Assisted Operations",
-        stack: ["Next.js", "TypeScript", "NestJS", "PostgreSQL", "Redis", "Kafka", "LLM APIs", "Docker", "OpenTelemetry"],
+        title: "RagSpec: RAG Evaluator",
+        category: "LLM Evaluation · Information Retrieval · Applied Statistics",
+        stack: ["Python", "Typer", "Pydantic", "httpx", "Gemini API", "pgvector", "bm25s", "sentence-transformers"],
         sections: [
           {
             title: "Overview",
             content: [
-              "Turning noisy application alerts into actionable investigations.",
-              "Modern applications produce a constant stream of logs, alerts, exceptions, and operational events. During an incident, engineers must identify related failures, understand the likely scope, find useful evidence, and coordinate a response.",
-              "An AI assistant can summarize large volumes of operational information, but allowing an AI model to execute arbitrary production actions introduces significant risk.",
-              "Relay is an incident-response workspace designed to help engineers understand and investigate incidents faster. It ingests application alerts, groups related events, maintains a shared incident timeline, and uses AI to summarize evidence and suggest investigation steps.",
-              "The system is designed around a clear boundary: AI helps engineers reason about an incident, while consequential actions remain subject to explicit authorization and human approval."
+              "A test suite for chatbots that answer from your documents.",
+              "A RAG chatbot searches documents, then writes an answer from what it finds. A small change, like a shorter prompt or fewer retrieved documents, can quietly make it worse, and trying a few questions by hand won't catch that.",
+              "RagSpec runs a fixed set of questions against a RAG system, scores the search step and every answer, and compares the results with a previous run. It only needs the system's answer and retrieved documents, so it works on a Python function or a URL.",
+              "It includes a command-line tool, an HTML dashboard, and a local playground where a question runs through two versions side by side. Every metric is implemented in the project rather than taken from an evaluation framework.",
             ]
           },
           {
             title: "The problem",
             content: [
-              "Relay focuses on several operational challenges.",
-              "• Alert fatigue: Repeated or related events can obscure the underlying incident.",
-              "• Fragmented context: Engineers often need to correlate events across services and time windows.",
-              "• Slow investigation: Understanding a failure may require manually reviewing logs and prior incident notes.",
-              "• Unreliable AI suggestions: A summary or suggested fix can be misleading if it lacks evidence.",
-              "• Dangerous automation: An AI system should not receive unrestricted access to production infrastructure.",
-              "The product aims to improve the investigation workflow without replacing engineering judgment."
+              "• A RAG system can fail in separate places: search misses the right document, the answer adds facts the documents don't contain, or a citation points to the wrong source.",
+              "• Averages mislead: a small change in a mean can be noise from a few questions, and a fixed threshold either fires on that noise or misses real drops.",
+              "• An LLM judge is itself a model that can be wrong, so its grades need checking before anyone trusts them.",
             ]
           },
           {
             title: "Product experience",
             content: [
-              "The application provides a central incident workspace where engineers can:",
-              "• Receive alerts through an authenticated webhook or event stream.",
-              "• View incident severity, affected services, status, and event timeline.",
-              "• Group duplicate or related alerts into a single incident.",
-              "• Inspect relevant logs and supporting evidence.",
-              "• Generate an AI-assisted incident summary and a list of possible investigation steps.",
-              "• Assign ownership, add notes, and update incident status.",
-              "• Record approved actions and preserve an audit trail.",
-              "The AI assistant is designed to distinguish observed evidence from hypotheses. It cites the relevant logs used to support a conclusion and clearly communicates uncertainty."
+              "• Verdict first: the playground and dashboard state whether a change would be blocked, and why, in plain language.",
+              "• Side-by-side answers: each version shows its checks, its answer, and each fact marked as backed, not in the documents, or contradicted, with the judge's reason.",
+              "• Traceable citations: clicking a citation opens the document behind it.",
+              "• Saved results work with no API calls. Live questions run through a free hosted model, and a quota error gets one clear message.",
             ]
           },
           {
             title: "Architecture and system design",
             content: [
-              "Relay separates event ingestion, incident management, real-time delivery, AI analysis, and action execution.",
-              "```mermaid\nflowchart TD\n    subgraph Event Processing\n    A[Monitoring Alerts] --> B[Authenticated Webhook]\n    B --> C[Kafka Queue]\n    C --> D[Deduplication & Correlation]\n    D --> E[(Incident DB)]\n    end\n    subgraph Real-time UI\n    E -- \"State Changes\" --> F[WebSocket Service]\n    F --> G[Live Incident Dashboard]\n    end\n    subgraph AI Investigation\n    H[User Requests Summary] --> I[Redaction & Policy Check]\n    I --> J[Log Retrieval]\n    J --> K[LLM Provider]\n    K --> L[Structured AI Summary]\n    L --> G\n    end\n```",
-              "Event processing: Monitoring source → Authenticated API → Validation → Queue → Deduplication → Incident state.",
-              "AI investigation: Incident context → Evidence selection → Redaction/Policy checks → LLM analysis → Structured summary → Human review.",
-              "Real-time UI: Incident state changes → Event publication → WebSocket/SSE delivery → Live incident dashboard.",
-              "1. Event ingestion and processing: The ingestion API accepts structured alerts, assigns a stable identifier, and publishes them to a queue. Consumers normalize attributes, detect duplicates, and correlate related events based on rules like service, fingerprint, and time window.",
-              "2. Incident lifecycle and data model: Incident status transitions are validated by the backend. A relational database stores incident records, relationships, state transitions, and audit history. Event payloads retain references to log evidence without bloating the primary database.",
-              "3. Real-time incident dashboard: The frontend receives updates via WebSockets or Server-Sent Events. The backend remains the source of truth, allowing clients to reload state after disconnecting. The system handles duplicate notifications and out-of-order events gracefully.",
-              "4. AI-assisted investigation: When an engineer requests an AI summary, the system gathers relevant incident data (alerts, logs, service metadata). Sensitive values are redacted. The LLM generates a structured response (summary, symptoms, hypotheses, steps, cited evidence).",
-              "5. Controlled tools and human approval: Read-only tools allow the AI to retrieve related logs or deployment records. Any action that changes a production system requires explicit human approval, authorization checks, and an auditable record of execution."
+              "RagSpec treats the RAG system as a black box. Chunking, embeddings and reranking stay inside the system being tested.",
+              "```mermaid\nflowchart TD\n    Q[\"Test questions with relevance labels\"] --> R[\"Runner\"]\n    R --> S[\"RAG system under test: Python function or URL\"]\n    S -->|\"answer + retrieved documents\"| R\n    R --> M[\"Retrieval metrics: recall, nDCG, MRR\"]\n    R --> J[\"LLM judge: a verdict for each claim\"]\n    J --> F[\"Validate, then score in code: faithfulness, citation precision and recall\"]\n    M --> U[\"Run file\"]\n    F --> U\n    U --> C[\"Compare with baseline: paired bootstrap and gate\"]\n    C --> O[\"Terminal, dashboard, playground, pass or fail\"]\n```",
+              "• Runner: asks every question concurrently, with separate limits for the system under test and the judge.",
+              "• Judge: works with Gemini or other OpenAI-compatible APIs, Claude, or a local Ollama model, through one small interface. Verdicts are cached by content hash.",
+              "• Compare: pairs the same questions across two runs, computes a confidence interval, and sets a pass or fail exit code.",
+              "• Benchmark pipelines: BM25, dense vectors in pgvector, hybrid with Reciprocal Rank Fusion, and two cross-encoder rerankers.",
             ]
           },
           {
             title: "Key engineering decisions",
             content: [
-              "• Why use an event-driven pipeline? Alert ingestion should not wait for every downstream operation to finish. Queue-based processing absorbs bursts and allows independent scaling.",
-              "• Why separate AI analysis from incident state? Generated summaries can be revised or corrected. Keeping them separate preserves the integrity of the incident timeline and makes AI output easier to audit.",
-              "• Why require approval for consequential actions? Incident response involves sensitive systems. Human approval, least-privilege tools, and server-side authorization reduce the risk of an incorrect AI suggestion causing further damage.",
-              "• Why keep the first version read-only? Read-only investigation is easier to validate and safer to demonstrate."
+              "• Why verdicts rather than scores? A 1–10 rating from a model drifts and can't be explained. The judge labels each claim, and code does the counting, so every score traces back to sentences you can read.",
+              "• Why a paired bootstrap? Comparing the same question in both runs removes differences in question difficulty. A metric only counts as regressed if its whole 95% interval is below zero and the drop exceeds a small tolerance.",
+              "• Why not trust the judge's output? It's constrained by a JSON schema, can't cite documents that weren't retrieved, and malformed output becomes an error, never a score.",
+              "• Why tell the judge the product name? Rewording the prompt kept failing: the judge rejected correct facts because the documents never named the product, then found new ways to do it. Passing the name as a setting fixed the cause.",
             ]
           },
           {
-            title: "Security and reliability",
+            title: "Results",
             content: [
-              "• Authenticate ingestion sources and validate payloads.",
-              "• Apply role-based permissions to incidents and operational tools.",
-              "• Redact secrets and sensitive log fields before model processing.",
-              "• Treat log contents as untrusted data that may contain prompt injection.",
-              "• Require human approval for consequential actions with immutable audit records.",
-              "• Use idempotent consumers, bounded retries, and dead-letter queues.",
-              "• Apply timeouts, quotas, and graceful fallbacks for AI-provider failures.",
-              "If the AI provider is unavailable, engineers should still be able to view alerts, inspect evidence, assign incidents, and manage their lifecycle."
+              "• Retrieval benchmark: 15 runs covering 5 retrievers on 3 BEIR datasets. BM25 and dense scores match published baselines (BM25 on NFCorpus: 0.322 against 0.325), a check on the metric code.",
+              "• “Hybrid is always better” didn't hold: on FiQA, hybrid search scored significantly worse than dense alone (nDCG@10 0.358 vs 0.399; change −0.041, 95% CI −0.058 to −0.025).",
+              "• An off-the-shelf reranker hurt: MiniLM significantly lowered SciFact nDCG@10 (0.723 to 0.685) and added about 150 ms per query.",
+              "• Regression demo: a simulated bad pull request (fewer documents, looser prompt) was flagged on 26 questions, with citation recall falling from 100% to 0%.",
+              "• Judge accuracy: on 20 hand-labelled cases kept out of tuning, the prompt with the product setting matched 22, 23 and 23 of 23 checks across three runs, against 20, 22 and 21 for the original prompt. I wrote those cases myself, so they're a sanity check rather than independent proof.",
+              "• A negative result, reported: the judge once scored 22/22 on a smaller check, yet on real answers it rejected correct facts. Reading the verdicts by hand showed that a flagged faithfulness drop was mostly judge false alarms.",
             ]
           },
           {
-            title: "How success will be measured",
+            title: "Limits and next steps",
             content: [
-              "The evaluation uses a repeatable collection of simulated incidents with known symptoms and expected outcomes.",
-              "Metrics to collect include:",
-              "• Event ingestion success rate and processing latency.",
-              "• Duplicate-alert grouping accuracy.",
-              "• Queue lag and recovery after worker failure.",
-              "• AI summary factuality against the provided incident evidence.",
-              "• Accuracy of evidence references and unsupported-claim rate.",
-              "• Real-time update latency and reconnect recovery.",
-              "• Authorization failures, audit completeness, and successful policy-enforcement tests."
+              "• The judge still sometimes rejects correct calculated numbers, and a few grades change between runs, so the demo's faithfulness drop (100% to 89%) is approximate. Of the five questions behind it, I read two as real, two as debatable and one as a judge error.",
+              "• Known gap: if a version stops saying “I don't know” and starts inventing answers, those questions can't be paired, so they're missing from the significance test.",
+              "• It measures whether answers are grounded in the documents, not whether they're correct or complete.",
+              "• The GitHub Action for pull requests is included but has never run on GitHub. Claude as a judge has also never been run; measured runs used Gemini and a local model.",
+              "• Next: close the pairing gap, add a metric for correct refusals, and validate the judge against a larger human-labelled set.",
             ]
           },
           {
             title: "What this project demonstrates",
             content: [
-              "Relay demonstrates how backend architecture, event-driven processing, real-time interfaces, observability, and AI orchestration can work together in an operationally sensitive product.",
-              "Its central engineering challenge is balancing the usefulness of AI-generated insights with the reliability, traceability, and access controls expected of an incident-response system.",
-              "The project reflects my approach to integrating AI responsibly: use it where it improves the workflow, preserve evidence and human judgment, and design the surrounding system to remain useful when the model fails."
+              "RagSpec shows how I approach LLM systems: measure them, check whether the measurement itself can be trusted, and report what the numbers can't support.",
+              "The most useful findings came from reading real outputs instead of accepting a good score, including the ones that showed my own evaluator was wrong.",
             ]
-          }
+          },
         ]
       },
-    }
+    },
   ],
   experience: [
     {
